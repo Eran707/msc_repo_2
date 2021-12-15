@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\section{Change in Membrane Voltage}
+\setlength{\jot}{10pt}
+\begin{equation}
+\frac{\delta V_{m}}{\delta t}= \frac{F}{C_{m} SA} \times w \times ([Na] + [K] - [Cl] + z[X]) \\
+\end{equation}
+
+\section{KCC2 Pump rate}
+\setlength{\jot}{10pt}
+\begin{align}
+E_{K} &= RTF \times log(\frac{[K]_{o}}{[K]_{i}})\\
+E_{Cl} &= RTF \times log(\frac{[Cl]_{o}}{[Cl]_{i}})\\
+J_{KCC2} &= g_{KCC2}\times(E_{K}-E_{Cl})\\
+\nonumber
+\end{align}
+
+
+\section{Changes in Intracelllar Ion Concentrations}
+\setlength{\jot}{10pt}
+\begin{align}
+\frac{\delta [Na]}{\delta t}&= -\dfrac{SA}{w}\times(g_{Na} \times(V_{m} - \dfrac{RT}{F} log(\dfrac{[Na]_{o}}{[Na]_{i}}) + 3J_{p}) \\
+\frac{\delta [K]}{\delta t}&= -\dfrac{SA}{w} \times (g_{K} \times (V_{m} - \dfrac{RT}{F} log(\dfrac{[K]_{o}}{[K]_{i}}) + 2J_{p} - J_{KCC2}) \\
+\frac{\delta [Cl]}{\delta t}&= -\dfrac{SA}{w} \times  (g_{Cl} \times(V_{m} - \dfrac{RT}{F} log(\dfrac{[Cl]_{o}}{[Cl]_{i}}) - J_{KCC2}) \\
+\nonumber
+\end{align}
+
+
+\end{document}
+
+
+
