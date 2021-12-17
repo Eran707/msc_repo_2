@@ -11,10 +11,10 @@ Analgous to the diffusion class from Kira and Chris
 
 from common import T, RTF,val,diff_constants
 from compartment import Compartment
-from constants import k,q,valence
+
 import pandas as pd
 import h5py
-import numba
+
 
 
 class Electrodiffusion:

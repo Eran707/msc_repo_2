@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 """
-
+# constants
+# R with different units
+# 8.31451                   J K-1 mol-1
+# 8.20578 x 10-2            L atm K-1 mol-1
+# 8.31451 x 10-2                L bar K-1 mol-1
+# 8.31451                           Pa m3 K-1 mol-1
+# 62.364                             L Torr K-1 mol-1
+# 1.98722                           cal K-1 mol-1
 R = 8.31446
 F: float = 96485.33  # Faraday's constant        C mol-1
 k = 1.38e-23  # Boltzmann constant        J K-1
@@ -51,3 +58,9 @@ val = {"na":1, "k":1, "cl":-1,"x":-0.85}
 
 diff_constants = {"na" : 1.33e-7, "k": 1.96e-7, "cl":2.03e-7, "x":0} #diffusion coefficients for the various ions in dm2/s
 #diff_constants = {"na" : 1.33e-8, "k": 1.96e-8, "cl":2.03e-8, "x":0}
+
+def valence(ion: str):
+    ion = ion.lower()
+    if ion.endswith("i") or ion.endswith("o"):
+        ion = ion[:-1]
+    return {"cl": -1, "k": 1, "na": 1}[ion]

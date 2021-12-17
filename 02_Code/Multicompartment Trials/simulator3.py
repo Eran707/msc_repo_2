@@ -14,7 +14,7 @@ import pandas as pd
 import compartment
 import electrodiffusion
 
-from common import F, gna,gcl,gk,gx,g_na_k_atpase,g_kcc2,cm
+from common import F, gna, gcl, gk, gx, g_na_k_atpase, g_kcc2, cm
 
 
 class simulator:
@@ -57,8 +57,6 @@ class simulator:
         self.xoflux_points, self.dt_xoflux, self.xo_alpha, self.xo_beta = 0, 0, 0, 0
         self.synapse_dict = {}
 
-
-
     def add_compartment(self, comp=compartment):
         """Every compartment created needs to be added to the simulator"""
 
@@ -84,9 +82,6 @@ class simulator:
             comp = compartment.Compartment("Comp" + str(i + 1), radius=0.5e-5, length=10e-5)
             comp.set_ion_properties()
             self.add_compartment(comp)
-
-
-
 
     def get_starting_df(self):
         """Function which when called will return a dataframe of the starting values for each compartment"""
@@ -115,10 +110,8 @@ class simulator:
         df_start.columns = ['Radius', 'Length', 'Volume', 'Na_i', 'K_i', 'Cl_i', 'X_i', 'z_i']
         return df_start
 
-
     def set_electrodiffusion_properties(self, ED_on=True):
         self.ED_on = ED_on
-
 
         with h5py.File(self.file_name, mode='a') as self.hdf:
 
@@ -129,9 +122,10 @@ class simulator:
                     name = self.comp_arr[e].name + ' -> ' + self.comp_arr[e + 1].name
                     ed_group.create_group(name)
 
-                    ed = electrodiffusion.Electrodiffusion(comp_a_name=self.comp_arr[e].name, comp_a_length=self.comp_arr[e].length,
-                                                               comp_b_name=self.comp_arr[e + 1].name,
-                                                               comp_b_length=self.comp_arr[e+1].length)
+                    ed = electrodiffusion.Electrodiffusion(comp_a_name=self.comp_arr[e].name,
+                                                           comp_a_length=self.comp_arr[e].length,
+                                                           comp_b_name=self.comp_arr[e + 1].name,
+                                                           comp_b_length=self.comp_arr[e + 1].length)
                     self.ed_arr.append(ed)
 
             else:
@@ -216,7 +210,7 @@ class simulator:
                     self.comp_arr[j].xflux_params["flux_rate"] = flux_rate
 
         xflux_names_arr.append("X-FLUX-" + str(self.xflux_count))  # names of the xflux
-        self.xflux_count +=1
+        self.xflux_count += 1
         with h5py.File(self.file_name, mode='a') as self.hdf:
             xflux_group = self.hdf.get("X-FLUX-SETTINGS")
             xflux_group.create_dataset(name=xflux_names_arr[-1], data=xflux_data_arr)
@@ -281,8 +275,7 @@ class simulator:
         @param max_neurotransmitter: max neurotransmitter concentration
         @return:
         """
-        self.syn_dict ={}
-
+        self.syn_dict = {}
 
         for i in range(len(self.comp_arr)):
             if comp_name == self.comp_arr[i].name:
@@ -321,13 +314,12 @@ class simulator:
         @return:
         """
 
-
         for i in range(len(self.comp_arr)):
             if comp_name == self.comp_arr[i].name:
                 comp_num = i
 
-        self.current_dict ={"Compartment":comp_num , "Current Type": 0, "Start Time": start_t,
-                            "Duration":duration, "End Time" :start_t+duration,  "Current Amplitude":current_mA}
+        self.current_dict = {"Compartment": comp_num, "Current Type": 0, "Start Time": start_t,
+                             "Duration": duration, "End Time": start_t + duration, "Current Amplitude": current_mA}
 
         if current_type == "Inhibitory":
             self.current_dict["Current Type"] = 0
@@ -336,10 +328,7 @@ class simulator:
 
         self.comp_arr[comp_num].set_current(self.current_dict)
 
-
-
     def run_simulation(self):
-
 
         self.start_t = time.time()
         for i in range(len(self.comp_arr)):
@@ -347,22 +336,21 @@ class simulator:
 
         while self.run_t < self.total_t:
 
-
             for a in self.gen_comps(self.comp_arr):
 
                 a.step(dt=self.dt,
-                           na_o=self.na_o, k_o=self.k_o, cl_o=self.cl_o,
-                           constant_j_atp=self.constant_j_atp,
-                           p=self.p, p_kcc2=2e-3 / F)
+                       na_o=self.na_o, k_o=self.k_o, cl_o=self.cl_o,
+                       constant_j_atp=self.constant_j_atp,
+                       p=self.p, p_kcc2=2e-3 / F)
 
-                    # step for each compartment
+                # step for each compartment
 
                 if a.xflux_switch and (a.xflux_params["start_t"] <= self.run_t <= a.xflux_params["end_t"]):
                     a.x_flux()
 
                 if a.zflux_switch and \
-                    (a.zflux_params["start_t"] <= self.run_t <= a.zflux_params[
-                                "end_t"]):
+                        (a.zflux_params["start_t"] <= self.run_t <= a.zflux_params[
+                            "end_t"]):
                     a.z_flux()
 
                 if self.xoflux_switch and \
@@ -377,7 +365,6 @@ class simulator:
                     if self.run_t >= self.current_dict["Start Time"] and self.run_t <= self.current_dict["End Time"]:
                         a.current_step(run_t=self.run_t, dt=self.dt)
 
-
                     # electrodiffusion dictionary for each compartment
 
             if self.ED_on:
@@ -390,9 +377,9 @@ class simulator:
 
                     # appending the electrodiffusion concentrations for each compartment
 
-
             for d in self.gen_comps(self.comp_arr):
-                d.update_volumes(self.dt, self.osm_o,self.constant_ar)  # updates of the volumes, arrays, and dataframe for each compartment
+                d.update_volumes(self.dt, self.osm_o,
+                                 self.constant_ar)  # updates of the volumes, arrays, and dataframe for each compartment
 
             for f in range(len(self.output_arr) - 1):
                 if self.steps == self.output_arr[f]:
@@ -420,13 +407,10 @@ class simulator:
             round(time.time() - self.start_t, 2)) + " s")
         self.end_t = time.time()
 
-
-
     def calc_tau(self):
-        g_net = gna + gcl + gk + gx +g_na_k_atpase +g_kcc2
-        tau = 1/g_net * cm
+        g_net = gna + gcl + gk + gx + g_na_k_atpase + g_kcc2
+        tau = 1 / g_net * cm
         return tau
-
 
     def save_to_file(self):
 

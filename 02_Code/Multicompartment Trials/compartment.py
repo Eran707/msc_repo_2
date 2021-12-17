@@ -24,8 +24,8 @@ import numpy as np
 
 from common import \
     gk, gna, gcl, \
-    pw, vw, RTF, cm
-from constants import F
+    pw, vw, RTF, cm, F
+
 
 
 ##################################################################################
