@@ -24,6 +24,7 @@ time_step = 1e-6
 sim.set_timing(total_t=total_t, time_step=time_step, intervals=1000)
 
 # sim.add_synapse("Comp2", "Inhibitory", 5, 2 * 1e-3, 1e-2)
+# sim.add_current
 sim.set_xflux(comps=["Comp8"], flux_type="static", start_t=120, end_t=180, x_conc=1e-3, z=-0.85, flux_rate=300*1e-3/60)
 #sim.set_zflux(comps=["Comp8"], start_t=120, end_t=180, z_end=-1.25)
 
