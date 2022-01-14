@@ -73,13 +73,13 @@ class simulator:
         """Sets the simulation to run with the default multicompartment model -- 9 compartments + 1 soma"""
 
         if soma:
-            soma = compartment.Compartment("0_Soma", radius=1e-5, length=20e-5)
+            soma = compartment.Compartment("0_Soma", radius=10e-5, length=200e-5)
             soma.set_ion_properties(na_i=0.013995241563512785, k_i=0.12286753014443351, cl_i=0.005171468255812758,
                                     x_i=0.15496634531836323)
             self.add_compartment(soma)
 
         for i in range(number_of_comps):
-            comp = compartment.Compartment("Comp" + str(i + 1), radius=0.5e-5, length=10e-5)
+            comp = compartment.Compartment("Comp" + str(i + 1), radius=5e-5, length=100e-5)
             comp.set_ion_properties()
             self.add_compartment(comp)
 
