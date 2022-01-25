@@ -9,7 +9,7 @@ Analgous to the diffusion class from Kira and Chris
 """
 
 
-from common import T, RTF,val,diff_constants
+from common import T, RTF,val
 from compartment import Compartment
 
 import pandas as pd
@@ -34,12 +34,15 @@ class Electrodiffusion:
         self.comp_b_length = comp_b_length
         self.dx =self.comp_a_length/2 + self.comp_b_length/2
 
+    def set_diff_constants(self, d_constant_dict= {"na" : 1.33e-7, "k": 1.96e-7, "cl":2.03e-7, "x":0}):
+        self.diff_constants = d_constant_dict
+
     def calc_diffusion(self,ion="",conc_a=0,conc_b=0):
         """
         Calculates Fick's law for Diffusion
         F = -D*dc/dx
         """
-        d = diff_constants[ion]
+        d = self.diff_constants[ion]
         dc = conc_a - conc_b
         j_diffusion = -1 * d * dc / self.dx
         return j_diffusion
@@ -51,7 +54,7 @@ class Electrodiffusion:
         Drift = -D*z/RTF*dV/dx*[C]
         """
         z = val[ion]
-        d = diff_constants[ion]
+        d = self.diff_constants[ion]
         j_drift = - (d / RTF * z * dV / self.dx) * (conc_a + conc_b)
         # Chris and Kira have a odd way of calculating the difference in concentration
         return j_drift

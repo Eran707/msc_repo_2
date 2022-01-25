@@ -101,6 +101,9 @@ class Compartment:
         self.E_cl = RTF * np.log(self.cl_i / cl_o)
         self.drivingf_cl = self.v - self.E_cl
 
+    def set_osmo_neutral_start(self):
+        self.k_i = self.cl_i - self.z_i * self.x_i - self.na_i
+
     def set_synapse(self, synapse_type='Inhibitory', start_t=0, duration=2e-3, max_neurotransmitter=1e-3, synapse_conductance = 1e-9):
         self.synapse_on = True
         self.synapse_type = synapse_type
@@ -146,24 +149,38 @@ class Compartment:
             current_dict = {"Compartment": 0, "Current Type": 0, "Start Time": 0,
                             "Duration": 0, "End Time":0, "Current Amplitude": 0}
         self.current_dict = current_dict
-
+        self.total_charge = current_dict["Current Amplitude"] * current_dict["Duration"]
+        self.total_mols = self.total_charge / F
+        self.total_conc = self.total_mols/self.w
+        self.conc_per_second = self.total_conc/(self.current_dict["Duration"])
+        self.conc_per_step = self.conc_per_second*self.dt
         self.mol_per_s = current_dict["Current Amplitude"] / F
 
         self.current_on = True
 
-    def current_step(self,run_t=0, dt=1e-6):
+    def current_step(self, run_t=0, dt=1e-6):
 
+        #self.total_conc = self.total_mols / self.w
+        #self.conc_per_dt = self.total_conc / self.dt
+
+        if self.current_dict["Current Type"] == 0:  # Inihibitory current
+            self.cl_i += self.conc_per_step
+        elif self.current_dict["Current Type"] == 1:  # Excitatory current
+            self.na_i += self.conc_per_step
+        """
+        
         if self.current_dict["Current Type"] == 0:  #Inihibitory current
             cl_current = self.mol_per_s /self.w
             cl_current = cl_current * dt
-            self.cl_i +=  cl_current
+            self.cl_i += cl_current
 
         elif self.current_dict["Current Type"] == 1: #Excitatory current
             na_current = self.mol_per_s / self.w
             na_current = na_current * dt
-            self.na_i +=  na_current
+            self.na_i += na_current
+         """
 
-        self.current_on = False
+
 
 
     def step(self, dt=0.001,

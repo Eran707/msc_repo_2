@@ -6,8 +6,8 @@ import simulator3
 import h5py
 # Base file is the original file where the simulation was run
 
-base_file_name = "Experiment-D16"
-new_file_name = "Experiment-H2"
+base_file_name = "Experiment-T1"
+new_file_name = "Experiment-H36"
 
 
 sim = simulator3.simulator(new_file_name)
@@ -46,16 +46,19 @@ with h5py.File(base_file_name, mode='r') as hdf:
         sim.add_compartment(comp)
         
 
-sim.set_electrodiffusion_properties(ED_on=True)
+sim.set_electrodiffusion_properties(ED_on=True, diff_constant_dict={"na" : 1.33e-8, "k": 1.96e-8, "cl":2.03e-8, "x":0} )
+
 
 sim.set_external_ion_properties()
 sim.set_j_atp(constant_j_atp=True)
-sim.set_area_scale(constant_ar=False)
-total_t = 0.2
+sim.set_area_scale(constant_ar=True)
+total_t = 0.1
 time_step = 1e-6
-sim.set_timing(total_t=total_t, time_step=time_step, intervals=3000)
+sim.set_timing(total_t=total_t, time_step=time_step, intervals=500000)
 #sim.add_synapse("Comp8", "Inhibitory", start_t=0.05, duration=2e-3, max_neurotransmitter= 1e-3, synapse_conductance=1.2e-9)
-sim.add_current("Comp8", current_type="Inhibitory", start_t=0.1, duration=1e-7, current_mA=1e-8)
+sim.add_current("Comp9", current_type="Excitatory", start_t=1e-3, duration=1e-6, current_A=0.1e-9, dt=time_step)
+
+
 
 sim.run_simulation()
 print("fin")

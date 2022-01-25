@@ -19,12 +19,12 @@ T = 37 + 273.15
 RTF = R * T / F
 RT = R * T
 # permeabilities
-gna = 2e-3/F
-gk = 7e-3/F
-gcl = 2e-3/F
+gna = 2e-3/(F)
+gk = 7e-3/(F)
+gcl = 2e-3/(F)
 gx = 1e-8 # gna,gk,gcl: conductances in mS/cm^2 conv to S/dm^2 (10^-3/10^-2) - corrected for neuron
-g_kcc2 = 2e-3/F
-g_na_k_atpase=(10 ** -1) / F
+g_kcc2 = 2e-3/(F)
+g_na_k_atpase=(10 ** -1) /  (F)
 # stochiometries
 ck = 2
 cna = 3  # cna,ck: pump (ATPase) stoichiometries
@@ -52,7 +52,9 @@ vw = 0.018 #partial molar volume of water, dm3/mol
 pw = 0.0015 #osmotic permeability, biological membrane (muscle? unknown), dm s
 km=5*10**(-14) #extensional rigidity of RBC at 23 deg, Mohandas and Evans (1994), N/dm
 
-cm = 2e-4 #default membrane capacitance (F/dm^2)
+#cm = 2e-4 #default membrane capacitance (F/dm^2)
+cm = 2e-4
+
 
 val = {"na":1, "k":1, "cl":-1,"x":-0.85}
 

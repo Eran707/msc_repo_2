@@ -69,17 +69,17 @@ class simulator:
         self.num_comps += 1
         self.comp_arr.append(comp)
 
-    def add_default_multicompartment(self, number_of_comps=9, soma=False):
+    def add_default_multicompartment(self, number_of_comps=9, rad=5e-5, len=100e-5, soma=False):
         """Sets the simulation to run with the default multicompartment model -- 9 compartments + 1 soma"""
 
         if soma:
-            soma = compartment.Compartment("0_Soma", radius=10e-5, length=200e-5)
+            soma = compartment.Compartment("0_Soma", radius=2*rad, length=2*len)
             soma.set_ion_properties(na_i=0.013995241563512785, k_i=0.12286753014443351, cl_i=0.005171468255812758,
                                     x_i=0.15496634531836323)
             self.add_compartment(soma)
 
         for i in range(number_of_comps):
-            comp = compartment.Compartment("Comp" + str(i + 1), radius=5e-5, length=100e-5)
+            comp = compartment.Compartment("Comp" + str(i + 1), radius=rad, length=len)
             comp.set_ion_properties()
             self.add_compartment(comp)
 
@@ -110,8 +110,10 @@ class simulator:
         df_start.columns = ['Radius', 'Length', 'Volume', 'Na_i', 'K_i', 'Cl_i', 'X_i', 'z_i']
         return df_start
 
-    def set_electrodiffusion_properties(self, ED_on=True):
+    def set_electrodiffusion_properties(self, ED_on=True, diff_constant_dict= {"na" : 1.33e-7, "k": 1.96e-7, "cl":2.03e-7, "x":0}):
         self.ED_on = ED_on
+        self.diff_constants = diff_constant_dict
+
 
         with h5py.File(self.file_name, mode='a') as self.hdf:
 
@@ -126,12 +128,17 @@ class simulator:
                                                            comp_a_length=self.comp_arr[e].length,
                                                            comp_b_name=self.comp_arr[e + 1].name,
                                                            comp_b_length=self.comp_arr[e + 1].length)
+
+                    ed.set_diff_constants(self.diff_constants)
                     self.ed_arr.append(ed)
 
             else:
                 ed_group.create_group("NO ED")
 
             self.hdf.close()
+
+
+
 
     def set_external_ion_properties(self, na_o=145e-3, k_o=3.5e-3, cl_o=119e-3, x_o=29.5e-3, z_o=-0.85):
         """
@@ -144,6 +151,17 @@ class simulator:
     def set_j_atp(self, constant_j_atp=False, p=-1):
         self.constant_j_atp = constant_j_atp
         self.p = (10 ** p) / F
+
+    def set_z(self, comp="Comp8", z=-0.85):
+        if comp == "All":
+            for i in range(len(self.comp_arr)):
+                self.comp_arr[i].z_i = z
+                self.comp_arr[i].set_osmo_neutral_start()
+        else:
+            for i in range(len(self.comp_arr)):
+                if comp == self.comp_arr[i].name:
+                    self.comp_arr[i].z_i = z
+                    self.comp_arr[i].set_osmo_neutral_start()
 
     def set_area_scale(self, constant_ar=False):
         self.constant_ar = constant_ar
@@ -303,7 +321,7 @@ class simulator:
         return
 
     def add_current(self, comp_name='', current_type='Inhibitory', start_t=0, duration=2 * 1e-3,
-                    current_mA=1e-3):
+                    current_A=1e-3,dt=1e-6):
         """
 
         @param comp_name: compartment name that current is being pulsed into
@@ -319,14 +337,16 @@ class simulator:
                 comp_num = i
 
         self.current_dict = {"Compartment": comp_num, "Current Type": 0, "Start Time": start_t,
-                             "Duration": duration, "End Time": start_t + duration, "Current Amplitude": current_mA}
+                             "Duration": duration, "End Time": start_t + duration, "Current Amplitude": current_A}
 
         if current_type == "Inhibitory":
             self.current_dict["Current Type"] = 0
         elif current_type == "Excitatory":
             self.current_dict["Current Type"] = 1
 
+        self.comp_arr[comp_num].dt = dt
         self.comp_arr[comp_num].set_current(self.current_dict)
+
 
     def run_simulation(self):
 
@@ -357,9 +377,9 @@ class simulator:
                         self.xoflux_params["start_t"] <= self.run_t <= self.xoflux_params["end_t"]:
                     self.xoflux()
 
-                if a.synapse_on:
-                    if self.run_t >= self.syn_dict['start_t'] and self.run_t <= self.syn_dict['end_t']:
-                        a.synapse_step(run_t=self.run_t)
+                #if a.synapse_on:
+                    #if self.run_t >= self.syn_dict['start_t'] and self.run_t <= self.syn_dict['end_t']:
+                        #a.synapse_step(run_t=self.run_t)
 
                 if a.current_on:
                     if self.run_t >= self.current_dict["Start Time"] and self.run_t <= self.current_dict["End Time"]:
